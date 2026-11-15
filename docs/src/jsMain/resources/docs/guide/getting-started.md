@@ -1,59 +1,73 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
+title: Getting started
 ---
 
 # Getting started
 
-## Requirements
+## Dependency
 
-- JDK 21 or newer; the Gradle wrapper is checked in (9.4.1).
-- Node and npm are downloaded and driven by the Kotlin Gradle plugin — there is no `npm install` step
-  to remember, and `kotlin.js.yarn=false` keeps npm as the package manager.
-- Chromium is downloaded by Playwright the first time a browser test runs.
-
-## Build, test, publish
-
-```bash
-./gradlew build                    # compile, Detekt, browser tests
-./gradlew :ktjs-wrapper-template-core:jsBrowserTest
-./gradlew :demo:e2eTest            # Playwright against the bundled demo page
-./gradlew :docs:docusaurusBuild    # the documentation site
-./gradlew pagesSite                # documentation at /, demo at /demo/, Dokka at /api/
+```kotlin
+kotlin {
+    js {
+        binaries.executable()
+        browser()
+    }
+    sourceSets {
+        jsMain.dependencies {
+            implementation("io.github.shijianjs:ktjs-bpmn:18.31.0-kt.1")
+            // The public API exposes `kotlin-browser`'s `web.*` types, so a consumer must be able to
+            // compile against them.
+            implementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2026.11.1")
+        }
+    }
+}
 ```
 
-`build` does not run the demo's end-to-end suite or assemble the Pages site: both need a browser and
-are part of CI as separate steps.
+Kotlin 2.4.21 or newer; the module emits ESM and targets `es2015` or later.
 
-## Develop
+## Register the plugins
 
-```bash
-./gradlew :docs:docusaurusStart    # dev server for this site
-./gradlew :demo:jsBrowserRun       # dev server for the demo page
+There is no plugin registry. `bpmn-js` splits its API across ES modules and the package is published as ES modules, so every import must name a **fully specified** path:
+
+```kotlin
+BpmnViewer      // bpmn-js/lib/Viewer.js
+BpmnNavigatedViewer // bpmn-js/lib/NavigatedViewer.js
+BpmnModeler     // bpmn-js/lib/Modeler.js
 ```
 
-Docusaurus watches the site directory, so Markdown edits reload; Kotlin changes need
-`./gradlew :docs:docusaurusSite` first, because the site imports the compiled module.
+The wrapper does that for you. It also imports `bpmn-js/lib/util/ModelUtil.js` for the model helpers, and ships the stylesheets the library needs (`bpmn-js/dist/assets/{diagram-js.css,bpmn-js.css,bpmn-font/}`) with the npm dependency.
 
-## Where things live
+## First call
 
-| Path | Contents |
-| --- | --- |
-| `package.json` | the only place npm versions are declared (Dependabot maintains it) |
-| `wrapper-revisions.properties` | per-module `-kt.N` revision |
-| `ktjs-wrapper-template-core/src/jsMain/kotlin` | the wrapper declarations |
-| `ktjs-wrapper-template-core/src/jsTest/kotlin` | browser tests for them |
-| `demo/src/jsMain` | the demo page and its Kotlin entry point |
-| `docs/src/jsMain/kotlin` | the site configuration and sidebar |
-| `docs/src/jsMain/resources` | Markdown pages, MDX landing page, CSS, translations |
+```kotlin
+import io.github.shijianjs.ktjs.bpmn.bpmnModeler
+import io.github.shijianjs.ktjs.bpmn.core.BpmnContainer
+import io.github.shijianjs.ktjs.bpmn.core.BpmnEvents
+import io.github.shijianjs.ktjs.bpmn.core.baseViewerOptions
+import io.github.shijianjs.ktjs.bpmn.core.saveXMLOptions
 
-## The lock file
+fun mount(host: web.html.HTMLElement, xml: String) {
+    val modeler = bpmnModeler(baseViewerOptions { container = BpmnContainer(host) })
 
-npm dependencies are resolved once for the whole workspace and pinned in
-`kotlin-js-store/package-lock.json`. After adding or upgrading an npm dependency — or changing a
-module's version — regenerate it:
+    modeler.on(BpmnEvents.ImportDone) { println("imported: ${modeler.getDefinitions().type}") }
 
-```bash
-./gradlew kotlinUpgradePackageLock
+    modeler.importXML(xml).then {
+        modeler.saveXML(saveXMLOptions { format = true }).then { saved ->
+            println(saved.xml)
+            Unit
+        }
+    }
+}
 ```
 
-CI verifies the committed file, so a forgotten regeneration fails the build rather than drifting.
+The page needs the library's stylesheets, or the diagram renders unstyled and the palette has no icons.
+
+## Build and test
+
+```bash
+./gradlew build                     # compile, Detekt, browser tests
+./gradlew :ktjs-bpmn:jsBrowserTest     # only the wrapper's browser tests
+./gradlew :docs:docusaurusStart     # documentation dev server
+./gradlew pagesSite                 # docs at /, demo at /demo/, Dokka at /api/
+```

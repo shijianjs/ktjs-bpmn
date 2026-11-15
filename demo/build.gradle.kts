@@ -13,6 +13,16 @@ val brandAssets = tasks.register<Copy>("brandAssets") {
     into(layout.buildDirectory.dir("generated/brand"))
 }
 
+// bpmn-js draws with its own stylesheets and icon font, shipped inside the npm package: copy them
+// out of the npm workspace so the demo (and the Playwright suite) render the diagram and its palette.
+val bpmnAssets = tasks.register<Copy>("bpmnAssets") {
+    from(rootProject.layout.projectDirectory.dir("build/js/node_modules/bpmn-js/dist/assets")) {
+        // Keep the package's own `assets/` layout, which the stylesheets use for their font paths.
+        into("assets")
+    }
+    into(layout.buildDirectory.dir("generated/bpmn"))
+}
+
 kotlin {
     js {
         useEsModules()
@@ -29,11 +39,12 @@ kotlin {
     sourceSets {
         jsMain {
             resources.srcDir(brandAssets)
+            resources.srcDir(bpmnAssets)
         }
         jsMain.dependencies {
             implementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2026.11.1")
             // The published modules the demo demonstrates, one line each.
-            implementation(project(":ktjs-wrapper-template-core"))
+            implementation(project(":ktjs-bpmn"))
         }
 
         jvmTest.dependencies {
@@ -50,7 +61,7 @@ kotlin {
 // `srcDir(task)` contributes the directory but not the task dependency; resource processing is what
 // reads that directory, so the edge belongs there.
 tasks.named("jsProcessResources") {
-    dependsOn(brandAssets)
+    dependsOn(brandAssets, bpmnAssets)
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -72,7 +83,7 @@ tasks.register<Test>("e2eTest") {
     dependsOn("jsBrowserDistribution")
     // The Chromium is installed for the Kotlin/JS browser tests of the wrapper module, and this suite
     // reuses it. A derived project points this at its own first published module.
-    dependsOn(":ktjs-wrapper-template-core:kotlinInstallPlaywrightBrowsers")
+    dependsOn(":ktjs-bpmn:kotlinInstallPlaywrightBrowsers")
 
     testClassesDirs = jvmE2eCompilation.output.classesDirs
     classpath = files(jvmE2eCompilation.output.allOutputs, jvmE2eCompilation.runtimeDependencyFiles)
