@@ -65,7 +65,7 @@ kotlin {
             implementation(kotlin("test"))
             // `await()` turns the library's promises into suspend points, so the tests read top to
             // bottom instead of nesting `then` callbacks.
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
         }
     }
 }
