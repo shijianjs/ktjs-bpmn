@@ -1,5 +1,9 @@
 package demo.page.modeler
 
+import io.github.shijianjs.ktjs.demo.page.DemoPage
+import io.github.shijianjs.ktjs.dom.webcomponent.defineIfMissing
+import web.components.CustomElementReference
+import web.dom.TagName
 import io.github.shijianjs.ktjs.bpmn.bpmnModeler
 import io.github.shijianjs.ktjs.bpmn.core.BpmnContainer
 import io.github.shijianjs.ktjs.bpmn.core.baseViewerOptions
@@ -9,10 +13,8 @@ import io.github.shijianjs.ktjs.demo.i18n.Lang
 import io.github.shijianjs.ktjs.demo.i18n.Langs
 import io.github.shijianjs.ktjs.demo.i18n.Translations
 import io.github.shijianjs.ktjs.demo.i18n.texts
-import io.github.shijianjs.ktjs.demo.nav.Page
 import io.github.shijianjs.ktjs.demo.page.exampleBox
 import io.github.shijianjs.ktjs.demo.page.grid
-import io.github.shijianjs.ktjs.demo.page.newPage
 import io.github.shijianjs.ktjs.demo.page.sectionBlock
 import io.github.shijianjs.ktjs.dom.element.inlineStyle
 import io.github.shijianjs.ktjs.dom.element.invoke
@@ -100,8 +102,7 @@ private val elementCount: (JsAny) -> Double = js("(registry) => registry.getAll(
  * [io.github.shijianjs.ktjs.demo.page.DemoPage.addLinkedSheet]; the icon font's `url()`s are
  * re-pointed at the original sheet while copying, otherwise every glyph would be missing.
  */
-internal class ModelerPage : Page {
-    private val page = newPage()
+internal class ModelerPage : DemoPage() {
 
     private val texts = Binder(modelerTexts)
 
@@ -135,12 +136,11 @@ internal class ModelerPage : Page {
         createButton { setAttribute("data-action", action.id) }
     }
 
-    override val node get() = page
 
     init {
-        page.addLinkedSheet("assets/diagram-js.css")
-        page.addLinkedSheet("assets/bpmn-js.css")
-        page.addLinkedSheet("assets/bpmn-font/css/bpmn.css")
+        addLinkedSheet("assets/diagram-js.css")
+        addLinkedSheet("assets/bpmn-js.css")
+        addLinkedSheet("assets/bpmn-font/css/bpmn.css")
 
         val section = sectionBlock()
         texts.bind(section.title, { it.canvasHeading })
@@ -155,7 +155,7 @@ internal class ModelerPage : Page {
         texts.bind(output.title, { it.xmlHeading })
         output.body.append(exampleBox(null, xml))
 
-        page.body.append(section.root, output.root)
+        body.append(section.root, output.root)
         xml.textContent = current.emptyXml
 
         buttons.forEachIndexed { index, button ->
@@ -219,14 +219,22 @@ internal class ModelerPage : Page {
 
     override fun applyTranslation(lang: Lang) {
         current = modelerTexts[lang]
-        page.setTitle(current.title)
-        page.setSummary(current.summary)
+        setTitle(current.title)
+        setSummary(current.summary)
         texts.apply(lang)
         buttons.forEachIndexed { index, button ->
             button.textContent = current.labels.getOrElse(index) { "" }
         }
         xml.textContent = current.emptyXml
         modeler?.let { refresh(it) }
+    }
+
+    companion object : CustomElementReference<ModelerPage>(ModelerPage::class.js) {
+        val NAME: TagName<ModelerPage> = TagName("bpmn-modeler-page")
+
+        fun define() {
+            defineIfMissing(NAME, this)
+        }
     }
 }
 
@@ -298,3 +306,9 @@ private fun sampleDiagram(texts: ModelerTexts): String = """
       </bpmndi:BPMNDiagram>
     </bpmn:definitions>
 """.trimIndent()
+
+/** Creates a defined `<bpmn-modeler-page>`. */
+internal fun newModelerPage(): ModelerPage {
+    ModelerPage.define()
+    return ModelerPage.NAME()
+}

@@ -1,7 +1,7 @@
 package demo
 
-import demo.page.modeler.ModelerPage
-import demo.page.overview.OverviewPage
+import demo.page.modeler.newModelerPage
+import demo.page.overview.newOverviewPage
 import io.github.shijianjs.ktjs.demo.nav.DemoMenu
 import io.github.shijianjs.ktjs.demo.nav.Entry
 import io.github.shijianjs.ktjs.demo.nav.Group
@@ -25,7 +25,7 @@ internal val EXAMPLES: Group = Group("examples", "lucide:play")
 /** The site: one entry per page. */
 fun siteMenu(): DemoMenu = DemoMenu(
     listOf(
-        Entry("overview", START, "lucide:sparkles") { OverviewPage() },
-        Entry("modeler", EXAMPLES, "lucide:workflow") { ModelerPage() },
+        Entry("overview", START, "lucide:sparkles") { newOverviewPage() },
+        Entry("modeler", EXAMPLES, "lucide:workflow") { newModelerPage() },
     ),
 )
