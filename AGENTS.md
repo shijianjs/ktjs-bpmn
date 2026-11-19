@@ -576,6 +576,34 @@ klibs.io 从 Maven Central 与 GitHub 自动抓取，无需提交元数据文件
 - 本地预览：执行 `./gradlew pagesSite` 后给 `build/pages` 起任意静态服务器。直接开 `file://` 会因相对
   路径与 CORS 导致资源加载异常。
 
+## 演示页：桥到 `ktjs-demo-kit`
+
+`demo` 的外壳（导航、语言、主题、页面骨架）全部来自 `ktjs-demo-kit`，本仓库只留内容：`Main.kt` 里
+`DemoLayout.define()` + `DemoMenu`，每个页面一个 `DemoPage` 子类（`page/overview`、`page/modeler`），
+文案走 `SiteTexts` / `Translations`。`demo/build.gradle.kts` 里的 `ktjs-demo-kit` 依赖与 Lumo 拷贝由
+仓库脚手架的接线步骤加好，`gradle.properties` 的 `ktjs-demo-kit.version` 随工作树写 `-SNAPSHOT`。
+
+bpmn-js 有三处与这个外壳的交互必须注意，三者都**不报错、只表现为难看**：
+
+1. **样式表要重挂进 shadow 树**：`index.html` 里那三份 `<link>`（`assets/diagram-js.css`、
+   `assets/bpmn-js.css`、`assets/bpmn-font/css/bpmn.css`）只作用于 document，而画布在页面的 shadow root
+   里。改成 `page.addLinkedSheet("assets/diagram-js.css")` 等三行（内部读链接表的 `cssRules` 填进
+   `CSSStyleSheet` 再 `addSheet`）；`bpmn-font` 里的字体 `url()` 靠 `addLinkedSheet` 的
+   `absolutizeUrls` 重指回原 sheet，否则调色板图标全是方块。
+2. **画布宿主必须给确定高度**（`height = 460.px`，不能只写 `minHeight`）：diagram-js 的 `createContainer`
+   给 `.djs-container` 内联 `height: 100%`，百分比要对着高度确定的宿主才解析得出值；宿主高度是
+   `auto` 时 SVG 退回默认 150px，图元被竖向压扁（110×80 的任务框渲成 110×30），控制台一声不响。
+3. **建 modeling 要等到真实盒尺寸**：`createOnceMounted()` 里除了 `isConnected`，还要等
+   `clientHeight >= 400 && clientWidth >= 100` 再 `new Modeler`，否则容器尺寸按 0/150 算出来，之后
+   只有 diagram-js 自己的 resize 路径才会纠正（窗口 resize 不会）。
+
+样例 XML 的 DI 里，`di:waypoint` 属于 `http://www.omg.org/spec/DD/20100524/DI`，`bpmndi:BPMNEdge` 属于
+`http://www.omg.org/spec/BPMN/20100524/DI`。把 waypoint 写成后一个命名空间，moddle 会静默丢掉 waypoints，
+连线退回「图元中心到中心」、横穿任务框和任务名（同样不报错，只是看着像文字被横线穿过）。
+
+端到端测试 `demo/src/jvmTest/kotlin/demo/e2e/DemoPageTest.kt` 覆盖外壳（logo / 标题 / 菜单 / 语言切换）、
+总览页与建模器（画布尺寸、图元数量、导出面板）。
+
 ## 文档约定
 
 - 需要跨会话、跨上下文感知的信息（环境约定、构建方式、模块结构、容易踩的坑）记录在本文件。
