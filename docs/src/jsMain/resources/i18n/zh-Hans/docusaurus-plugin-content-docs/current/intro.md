@@ -17,6 +17,18 @@ title: 简介
 | `ktjs-bpmn` | `io.github.shijianjs:ktjs-bpmn` | `bpmn-js` 18.31.0 |
 
 一个 npm 包、一个 Gradle 模块、一个 Kotlin 包（`io.github.shijianjs.ktjs.bpmn`），选项、结果类型与模型助手放在 `core` 子包。
+```mermaid
+flowchart TB
+  M["new BpmnModeler(options)<br/>container / keyboard / additionalModules"] --> CORE["建模核心<br/>elementRegistry、modeling、palette、contextPad"]
+  M --> XML["序列化<br/>saveXML、importXML、createDiagram"]
+  M --> MODEL["模型助手<br/>选项、结果类型"]
+  CORE --> K["io.github.shijianjs.ktjs.bpmn<br/>（含 core 子包）"]
+  XML --> K
+  MODEL --> K
+  K --> D["演示页：订单处理流程"]
+```
+
+一个建模器对象持有整张图：wrapper 决定你能碰哪些服务与调用，流程本身由库画、由库编辑。
 
 ## 许可证
 

@@ -18,6 +18,19 @@ The wrapper covers the three documented entry points of `bpmn-js` 18: `Viewer`, 
 | `ktjs-bpmn` | `io.github.shijianjs:ktjs-bpmn` | `bpmn-js` 18.31.0 |
 
 One npm package, one Gradle module, one Kotlin package (`io.github.shijianjs.ktjs.bpmn`) with a `core` sub-package for the options, the result types and the model helpers.
+```mermaid
+flowchart TB
+  M["new BpmnModeler(options)<br/>container / keyboard / additionalModules"] --> CORE["modeling core<br/>elementRegistry, modeling, palette, contextPad"]
+  M --> XML["serialisation<br/>saveXML, importXML, createDiagram"]
+  M --> MODEL["model helpers<br/>options, result types"]
+  CORE --> K["io.github.shijianjs.ktjs.bpmn<br/>(+ core sub-package)"]
+  XML --> K
+  MODEL --> K
+  K --> D["demo: order-handling process"]
+```
+
+A modeler is one object that owns the diagram: the wrapper decides which services and calls you may
+reach, the library draws and edits the process itself.
 
 ## License
 
