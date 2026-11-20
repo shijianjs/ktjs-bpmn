@@ -203,6 +203,7 @@ internal class ModelerPage : DemoPage() {
         )
         /** How many elements the registry holds; the modeler's own bookkeeping, not the DOM's. */
         private val elementCount: (JsAny) -> Double = js("(registry) => registry.getAll().length")
+
         /**
          * The sample diagram: a start event, two tasks and an end event, labelled in the page's language.
          *
