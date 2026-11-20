@@ -62,7 +62,7 @@ private val modelerTexts: Translations<ModelerTexts> = texts(
     Langs.ZH_HANS to modelerChinese,
 )
 
-private typealias Modeler = io.github.shijianjs.ktjs.bpmn.BpmnModeler
+internal typealias Modeler = io.github.shijianjs.ktjs.bpmn.BpmnModeler
 
 private val ACTIONS: List<Action> = listOf(
     Action("new") { page, modeler -> page.createDiagram(modeler) },
