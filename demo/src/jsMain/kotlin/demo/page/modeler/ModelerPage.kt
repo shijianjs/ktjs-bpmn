@@ -1,9 +1,6 @@
 package demo.page.modeler
 
 import io.github.shijianjs.ktjs.demo.page.DemoPage
-import io.github.shijianjs.ktjs.dom.webcomponent.defineIfMissing
-import web.components.CustomElementReference
-import web.dom.TagName
 import io.github.shijianjs.ktjs.bpmn.bpmnModeler
 import io.github.shijianjs.ktjs.bpmn.core.BpmnContainer
 import io.github.shijianjs.ktjs.bpmn.core.baseViewerOptions
@@ -13,11 +10,12 @@ import io.github.shijianjs.ktjs.demo.i18n.Lang
 import io.github.shijianjs.ktjs.demo.i18n.Langs
 import io.github.shijianjs.ktjs.demo.i18n.Translations
 import io.github.shijianjs.ktjs.demo.i18n.texts
-import io.github.shijianjs.ktjs.demo.page.exampleBox
-import io.github.shijianjs.ktjs.demo.page.grid
-import io.github.shijianjs.ktjs.demo.page.sectionBlock
+import io.github.shijianjs.ktjs.demo.page.Blocks.exampleBox
+import io.github.shijianjs.ktjs.demo.page.Grid
+import io.github.shijianjs.ktjs.demo.page.SectionBlock
 import io.github.shijianjs.ktjs.dom.element.inlineStyle
 import io.github.shijianjs.ktjs.dom.element.invoke
+import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementReferenceAdapter
 import io.github.shijianjs.ktjs.vaadin.button.ButtonElement
 import io.github.shijianjs.ktjs.vaadin.button.createButton
 import kotlin.js.JsAny
@@ -142,16 +140,16 @@ internal class ModelerPage : DemoPage() {
         addLinkedSheet("assets/bpmn-js.css")
         addLinkedSheet("assets/bpmn-font/css/bpmn.css")
 
-        val section = sectionBlock()
+        val section = SectionBlock.NAME { show() }
         texts.bind(section.heading, { it.canvasHeading })
         texts.bind(section.hint, { it.hint })
         section.body.append(
-            grid(minColumnWidth = 150, *buttons.toTypedArray()),
+            Grid.NAME { show(150); add(*buttons.toTypedArray()) },
             status,
             exampleBox(null, canvas),
         )
 
-        val output = sectionBlock()
+        val output = SectionBlock.NAME { show() }
         texts.bind(output.heading, { it.xmlHeading })
         output.body.append(exampleBox(null, xml))
 
@@ -229,13 +227,7 @@ internal class ModelerPage : DemoPage() {
         modeler?.let { refresh(it) }
     }
 
-    companion object : CustomElementReference<ModelerPage>(ModelerPage::class.js) {
-        val NAME: TagName<ModelerPage> = TagName("bpmn-modeler-page")
-
-        fun define() {
-            defineIfMissing(NAME, this)
-        }
-    }
+    companion object : CustomElementReferenceAdapter<ModelerPage>(ModelerPage::class.js, "bpmn-modeler-page")
 }
 
 /**
@@ -306,9 +298,3 @@ private fun sampleDiagram(texts: ModelerTexts): String = """
       </bpmndi:BPMNDiagram>
     </bpmn:definitions>
 """.trimIndent()
-
-/** Creates a defined `<bpmn-modeler-page>`. */
-internal fun newModelerPage(): ModelerPage {
-    ModelerPage.define()
-    return ModelerPage.NAME()
-}

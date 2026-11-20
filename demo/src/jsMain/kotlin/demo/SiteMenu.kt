@@ -1,10 +1,11 @@
 package demo
 
-import demo.page.modeler.newModelerPage
-import demo.page.overview.newOverviewPage
+import demo.page.modeler.ModelerPage
+import demo.page.overview.OverviewPage
 import io.github.shijianjs.ktjs.demo.nav.DemoMenu
 import io.github.shijianjs.ktjs.demo.nav.Entry
 import io.github.shijianjs.ktjs.demo.nav.Group
+import io.github.shijianjs.ktjs.dom.element.invoke
 
 /** The bpmn-js version this demo is built against; the navbar shows it under the site name. */
 const val SITE_VERSION: String = "18.31.1"
@@ -25,7 +26,7 @@ internal val EXAMPLES: Group = Group("examples", "lucide:play")
 /** The site: one entry per page. */
 fun siteMenu(): DemoMenu = DemoMenu(
     listOf(
-        Entry("overview", START, "lucide:sparkles") { newOverviewPage() },
-        Entry("modeler", EXAMPLES, "lucide:workflow") { newModelerPage() },
+        Entry("overview", START, "lucide:sparkles") { OverviewPage.NAME() },
+        Entry("modeler", EXAMPLES, "lucide:workflow") { ModelerPage.NAME() },
     ),
 )
