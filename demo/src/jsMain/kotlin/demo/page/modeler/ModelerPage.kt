@@ -143,7 +143,7 @@ internal class ModelerPage : DemoPage() {
         addLinkedSheet("assets/bpmn-font/css/bpmn.css")
 
         val section = sectionBlock()
-        texts.bind(section.title, { it.canvasHeading })
+        texts.bind(section.heading, { it.canvasHeading })
         texts.bind(section.hint, { it.hint })
         section.body.append(
             grid(minColumnWidth = 150, *buttons.toTypedArray()),
@@ -152,7 +152,7 @@ internal class ModelerPage : DemoPage() {
         )
 
         val output = sectionBlock()
-        texts.bind(output.title, { it.xmlHeading })
+        texts.bind(output.heading, { it.xmlHeading })
         output.body.append(exampleBox(null, xml))
 
         body.append(section.root, output.root)

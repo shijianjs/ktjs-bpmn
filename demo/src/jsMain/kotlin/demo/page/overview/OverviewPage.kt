@@ -106,21 +106,21 @@ internal class OverviewPage : DemoPage() {
         addLink(texts.bind(anchor("", SOURCE_URL, external = true), { it.sourceLink }))
 
         val purpose = sectionBlock()
-        texts.bind(purpose.title, { it.purposeHeading })
+        texts.bind(purpose.heading, { it.purposeHeading })
         val bullets = HtmlTagName.ul {
             List(3) { index -> texts.bind(+HtmlTagName.li()) { it.bullets.getOrNull(index).orEmpty() } }
         }
         purpose.body.append(texts.bind(paragraph(), { it.body }), bullets)
 
         val xml = sectionBlock()
-        texts.bind(xml.title, { it.xmlHeading })
+        texts.bind(xml.heading, { it.xmlHeading })
         xml.body.append(
             texts.bind(paragraph(), { it.xmlBody }),
             row(codeText("modeler.saveXML(saveXMLOptions { format = true })")),
         )
 
         val next = sectionBlock()
-        texts.bind(next.title, { it.nextHeading })
+        texts.bind(next.heading, { it.nextHeading })
         next.body.append(texts.bind(paragraph(), { it.nextBody }))
 
         body.append(purpose.root, xml.root, next.root)
