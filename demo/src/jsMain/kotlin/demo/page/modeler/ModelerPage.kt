@@ -30,47 +30,7 @@ import web.events.addHandler
 import web.html.HTMLElement
 import web.html.HtmlTagName
 
-private val modelerEnglish: ModelerTexts = ModelerTexts(
-    title = "Modeler",
-    summary = "The real bpmn-js modeler: drag elements from the palette on the left, edit them with " +
-        "the context pad, then export the document as XML.",
-    canvasHeading = "Canvas",
-    xmlHeading = "The document as XML",
-    statusPrefix = "Elements in the diagram",
-    hint = "Everything on this page goes through the wrapper: `bpmnModeler`, `importXML`, `saveXML`, " +
-        "`createDiagram`, and the `service` accessor.",
-    emptyXml = "Export the document and its XML shows up here.",
-    labels = listOf("New diagram", "Export XML"),
-    sampleTexts = listOf("Order received", "Check stock", "Ship order", "Done"),
-)
-
-private val modelerChinese: ModelerTexts = ModelerTexts(
-    title = "建模器",
-    summary = "真实 bpmn-js 建模器：从左侧调色板拖入元素、用上下文菜单编辑，最后把文档导出成 XML。",
-    canvasHeading = "画布",
-    xmlHeading = "文档的 XML",
-    statusPrefix = "图元数量",
-    hint = "页面上的操作全走封装：`bpmnModeler`、`importXML`、`saveXML`、`createDiagram`，以及 " +
-        "`service` 访问器。",
-    emptyXml = "导出后，XML 会显示在这里。",
-    labels = listOf("新建流程图", "导出 XML"),
-    sampleTexts = listOf("收到订单", "检查库存", "发货", "完成"),
-)
-
-private val modelerTexts: Translations<ModelerTexts> = texts(
-    Langs.EN to modelerEnglish,
-    Langs.ZH_HANS to modelerChinese,
-)
-
 internal typealias Modeler = io.github.shijianjs.ktjs.bpmn.BpmnModeler
-
-private val ACTIONS: List<Action> = listOf(
-    Action("new") { page, modeler -> page.createDiagram(modeler) },
-    Action("export") { page, modeler -> page.exportXml(modeler) },
-)
-
-/** How many elements the registry holds; the modeler's own bookkeeping, not the DOM's. */
-private val elementCount: (JsAny) -> Double = js("(registry) => registry.getAll().length")
 
 /**
  * The modeler page: a toolbar, the canvas the palette and context pad live in, and the XML read back.
@@ -207,74 +167,109 @@ internal class ModelerPage : DemoPage() {
         modeler?.let { refresh(it) }
     }
 
-    companion object : CustomElementReferenceAdapter<ModelerPage>(ModelerPage::class.js, "bpmn-modeler-page")
+    companion object : CustomElementReferenceAdapter<ModelerPage>(ModelerPage::class.js, "bpmn-modeler-page") {
+        private val modelerEnglish: ModelerTexts = ModelerTexts(
+            title = "Modeler",
+            summary = "The real bpmn-js modeler: drag elements from the palette on the left, edit them with " +
+                "the context pad, then export the document as XML.",
+            canvasHeading = "Canvas",
+            xmlHeading = "The document as XML",
+            statusPrefix = "Elements in the diagram",
+            hint = "Everything on this page goes through the wrapper: `bpmnModeler`, `importXML`, `saveXML`, " +
+                "`createDiagram`, and the `service` accessor.",
+            emptyXml = "Export the document and its XML shows up here.",
+            labels = listOf("New diagram", "Export XML"),
+            sampleTexts = listOf("Order received", "Check stock", "Ship order", "Done"),
+        )
+        private val modelerChinese: ModelerTexts = ModelerTexts(
+            title = "建模器",
+            summary = "真实 bpmn-js 建模器：从左侧调色板拖入元素、用上下文菜单编辑，最后把文档导出成 XML。",
+            canvasHeading = "画布",
+            xmlHeading = "文档的 XML",
+            statusPrefix = "图元数量",
+            hint = "页面上的操作全走封装：`bpmnModeler`、`importXML`、`saveXML`、`createDiagram`，以及 " +
+                "`service` 访问器。",
+            emptyXml = "导出后，XML 会显示在这里。",
+            labels = listOf("新建流程图", "导出 XML"),
+            sampleTexts = listOf("收到订单", "检查库存", "发货", "完成"),
+        )
+        private val modelerTexts: Translations<ModelerTexts> = texts(
+            Langs.EN to modelerEnglish,
+            Langs.ZH_HANS to modelerChinese,
+        )
+        private val ACTIONS: List<Action> = listOf(
+            Action("new") { page, modeler -> page.createDiagram(modeler) },
+            Action("export") { page, modeler -> page.exportXml(modeler) },
+        )
+        /** How many elements the registry holds; the modeler's own bookkeeping, not the DOM's. */
+        private val elementCount: (JsAny) -> Double = js("(registry) => registry.getAll().length")
+        /**
+         * The sample diagram: a start event, two tasks and an end event, labelled in the page's language.
+         *
+         * The XML is a string because that is what `importXML` takes — the wrapper does not pretend to
+         * model BPMN itself.
+         */
+        private fun sampleDiagram(texts: ModelerTexts): String = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                              xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                              xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                              xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                              id="Definitions_demo" targetNamespace="http://bpmn.io/schema/bpmn">
+              <bpmn:process id="Process_demo" name="Order handling" isExecutable="false">
+                <bpmn:startEvent id="StartEvent_1" name="${texts.sampleTexts[0]}">
+                  <bpmn:outgoing>Flow_1</bpmn:outgoing>
+                </bpmn:startEvent>
+                <bpmn:task id="Task_1" name="${texts.sampleTexts[1]}">
+                  <bpmn:incoming>Flow_1</bpmn:incoming>
+                  <bpmn:outgoing>Flow_2</bpmn:outgoing>
+                </bpmn:task>
+                <bpmn:task id="Task_2" name="${texts.sampleTexts[2]}">
+                  <bpmn:incoming>Flow_2</bpmn:incoming>
+                  <bpmn:outgoing>Flow_3</bpmn:outgoing>
+                </bpmn:task>
+                <bpmn:endEvent id="EndEvent_1" name="${texts.sampleTexts[3]}">
+                  <bpmn:incoming>Flow_3</bpmn:incoming>
+                </bpmn:endEvent>
+                <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_1" />
+                <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_1" targetRef="Task_2" />
+                <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_2" targetRef="EndEvent_1" />
+              </bpmn:process>
+              <bpmndi:BPMNDiagram id="BPMNDiagram_demo">
+                <bpmndi:BPMNPlane id="BPMNPlane_demo" bpmnElement="Process_demo">
+                  <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+                    <dc:Bounds x="160" y="120" width="36" height="36" />
+                    <bpmndi:BPMNLabel>
+                      <dc:Bounds x="143" y="163" width="71" height="14" />
+                    </bpmndi:BPMNLabel>
+                  </bpmndi:BPMNShape>
+                  <bpmndi:BPMNShape id="Task_1_di" bpmnElement="Task_1">
+                    <dc:Bounds x="250" y="98" width="110" height="80" />
+                  </bpmndi:BPMNShape>
+                  <bpmndi:BPMNShape id="Task_2_di" bpmnElement="Task_2">
+                    <dc:Bounds x="420" y="98" width="110" height="80" />
+                  </bpmndi:BPMNShape>
+                  <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+                    <dc:Bounds x="590" y="120" width="36" height="36" />
+                    <bpmndi:BPMNLabel>
+                      <dc:Bounds x="583" y="163" width="51" height="14" />
+                    </bpmndi:BPMNLabel>
+                  </bpmndi:BPMNShape>
+                  <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+                    <di:waypoint x="196" y="138" />
+                    <di:waypoint x="250" y="138" />
+                  </bpmndi:BPMNEdge>
+                  <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+                    <di:waypoint x="360" y="138" />
+                    <di:waypoint x="420" y="138" />
+                  </bpmndi:BPMNEdge>
+                  <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+                    <di:waypoint x="530" y="138" />
+                    <di:waypoint x="590" y="138" />
+                  </bpmndi:BPMNEdge>
+                </bpmndi:BPMNPlane>
+              </bpmndi:BPMNDiagram>
+            </bpmn:definitions>
+        """.trimIndent()
+    }
 }
-
-/**
- * The sample diagram: a start event, two tasks and an end event, labelled in the page's language.
- *
- * The XML is a string because that is what `importXML` takes — the wrapper does not pretend to
- * model BPMN itself.
- */
-private fun sampleDiagram(texts: ModelerTexts): String = """
-    <?xml version="1.0" encoding="UTF-8"?>
-    <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      id="Definitions_demo" targetNamespace="http://bpmn.io/schema/bpmn">
-      <bpmn:process id="Process_demo" name="Order handling" isExecutable="false">
-        <bpmn:startEvent id="StartEvent_1" name="${texts.sampleTexts[0]}">
-          <bpmn:outgoing>Flow_1</bpmn:outgoing>
-        </bpmn:startEvent>
-        <bpmn:task id="Task_1" name="${texts.sampleTexts[1]}">
-          <bpmn:incoming>Flow_1</bpmn:incoming>
-          <bpmn:outgoing>Flow_2</bpmn:outgoing>
-        </bpmn:task>
-        <bpmn:task id="Task_2" name="${texts.sampleTexts[2]}">
-          <bpmn:incoming>Flow_2</bpmn:incoming>
-          <bpmn:outgoing>Flow_3</bpmn:outgoing>
-        </bpmn:task>
-        <bpmn:endEvent id="EndEvent_1" name="${texts.sampleTexts[3]}">
-          <bpmn:incoming>Flow_3</bpmn:incoming>
-        </bpmn:endEvent>
-        <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_1" />
-        <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_1" targetRef="Task_2" />
-        <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_2" targetRef="EndEvent_1" />
-      </bpmn:process>
-      <bpmndi:BPMNDiagram id="BPMNDiagram_demo">
-        <bpmndi:BPMNPlane id="BPMNPlane_demo" bpmnElement="Process_demo">
-          <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
-            <dc:Bounds x="160" y="120" width="36" height="36" />
-            <bpmndi:BPMNLabel>
-              <dc:Bounds x="143" y="163" width="71" height="14" />
-            </bpmndi:BPMNLabel>
-          </bpmndi:BPMNShape>
-          <bpmndi:BPMNShape id="Task_1_di" bpmnElement="Task_1">
-            <dc:Bounds x="250" y="98" width="110" height="80" />
-          </bpmndi:BPMNShape>
-          <bpmndi:BPMNShape id="Task_2_di" bpmnElement="Task_2">
-            <dc:Bounds x="420" y="98" width="110" height="80" />
-          </bpmndi:BPMNShape>
-          <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
-            <dc:Bounds x="590" y="120" width="36" height="36" />
-            <bpmndi:BPMNLabel>
-              <dc:Bounds x="583" y="163" width="51" height="14" />
-            </bpmndi:BPMNLabel>
-          </bpmndi:BPMNShape>
-          <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
-            <di:waypoint x="196" y="138" />
-            <di:waypoint x="250" y="138" />
-          </bpmndi:BPMNEdge>
-          <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
-            <di:waypoint x="360" y="138" />
-            <di:waypoint x="420" y="138" />
-          </bpmndi:BPMNEdge>
-          <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
-            <di:waypoint x="530" y="138" />
-            <di:waypoint x="590" y="138" />
-          </bpmndi:BPMNEdge>
-        </bpmndi:BPMNPlane>
-      </bpmndi:BPMNDiagram>
-    </bpmn:definitions>
-""".trimIndent()
