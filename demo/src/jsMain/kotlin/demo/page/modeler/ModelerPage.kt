@@ -21,7 +21,6 @@ import io.github.shijianjs.ktjs.vaadin.button.createButton
 import kotlin.js.JsAny
 import web.animations.requestAnimationFrame
 import web.cssom.FontFamily
-import web.cssom.FontSize
 import web.cssom.Margin
 import web.cssom.Overflow
 import web.cssom.WhiteSpace
@@ -30,21 +29,6 @@ import web.dom.clickEvent
 import web.events.addHandler
 import web.html.HTMLElement
 import web.html.HtmlTagName
-
-/** Every string this page shows, in one language. */
-private class ModelerTexts(
-    val title: String,
-    val summary: String,
-    val canvasHeading: String,
-    val xmlHeading: String,
-    val statusPrefix: String,
-    val hint: String,
-    val emptyXml: String,
-    /** The button labels, in the order of [ACTIONS]. */
-    val labels: List<String>,
-    /** The sample diagram's own texts: start event, two tasks, end event. */
-    val sampleTexts: List<String>,
-)
 
 private val modelerEnglish: ModelerTexts = ModelerTexts(
     title = "Modeler",
@@ -77,9 +61,6 @@ private val modelerTexts: Translations<ModelerTexts> = texts(
     Langs.EN to modelerEnglish,
     Langs.ZH_HANS to modelerChinese,
 )
-
-/** One toolbar button: what it does to the modeler, and what it does to the readouts. */
-private class Action(val id: String, val run: (ModelerPage, Modeler) -> Unit)
 
 private typealias Modeler = io.github.shijianjs.ktjs.bpmn.BpmnModeler
 
@@ -133,7 +114,6 @@ internal class ModelerPage : DemoPage() {
     private val buttons: List<ButtonElement> = ACTIONS.map { action ->
         createButton { setAttribute("data-action", action.id) }
     }
-
 
     init {
         addLinkedSheet("assets/diagram-js.css")
