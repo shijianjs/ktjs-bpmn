@@ -15,7 +15,6 @@ import io.github.shijianjs.ktjs.demo.page.Grid
 import io.github.shijianjs.ktjs.demo.page.SectionBlock
 import io.github.shijianjs.ktjs.dom.element.inlineStyle
 import io.github.shijianjs.ktjs.dom.element.invoke
-import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementReferenceAdapter
 import io.github.shijianjs.ktjs.vaadin.button.ButtonElement
 import io.github.shijianjs.ktjs.vaadin.button.createButton
 import kotlin.js.JsAny
@@ -167,7 +166,7 @@ internal class ModelerPage : DemoPage() {
         modeler?.let { refresh(it) }
     }
 
-    companion object : CustomElementReferenceAdapter<ModelerPage>(ModelerPage::class.js, "bpmn-modeler-page") {
+    companion object : ModelerPageDefaultReference() {
         private val modelerEnglish: ModelerTexts = ModelerTexts(
             title = "Modeler",
             summary = "The real bpmn-js modeler: drag elements from the palette on the left, edit them with " +
