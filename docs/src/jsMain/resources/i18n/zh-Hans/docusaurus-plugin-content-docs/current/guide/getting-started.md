@@ -37,6 +37,14 @@ BpmnModeler     // bpmn-js/lib/Modeler.js
 
 wrapper 已经替你写好。它同时导入 `bpmn-js/lib/util/ModelUtil.js` 提供模型助手，并随 npm 依赖携带库自带的样式（`bpmn-js/dist/assets/{diagram-js.css,bpmn-js.css,bpmn-font/}`）。
 
+```mermaid
+flowchart LR
+    NEW["bpmnModeler(baseViewerOptions { container = BpmnContainer(host) })"] --> ON["on(BpmnEvents.ImportDone)：回调由 shim 包一层，不返回 Unit"]
+    ON --> LOAD["importXML(xml)"]
+    LOAD --> SAVE["saveXML(saveXMLOptions { format = true })"]
+    SAVE --> OUT["saved.xml"]
+```
+
 ## 第一个调用
 
 ```kotlin

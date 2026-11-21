@@ -14,6 +14,15 @@ below, **New diagram** calls `createDiagram` and empties it again. The status li
 element count out of the `elementRegistry` service, and the language switch rewrites every label.
 
 
+```mermaid
+flowchart LR
+    M["modeler mounted on the sample order process"] --> P["palette adds elements, context pad edits them"]
+    P --> D["the diagram is bpmn-js's own rendering"]
+    M --> E1["Export XML → saveXML → the panel below"]
+    M --> E2["New diagram → createDiagram → empty canvas"]
+    M --> S["status line: element count from elementRegistry"]
+```
+
 The language button in the page header switches between English and Simplified Chinese: every
 visible string changes, not just the title.
 

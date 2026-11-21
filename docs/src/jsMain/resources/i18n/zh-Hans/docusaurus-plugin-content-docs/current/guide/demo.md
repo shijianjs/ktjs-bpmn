@@ -12,6 +12,15 @@ title: 演示页
 **新建流程图** 调用 `createDiagram` 并把它清空。状态行通过 `elementRegistry` 服务读出图元数量，
 语言开关会改写每个标签。
 
+```mermaid
+flowchart LR
+    M["modeler 挂在示例订单流程上"] --> P["palette 加元素、context pad 编辑"]
+    P --> D["图表由 bpmn-js 自己渲染"]
+    M --> E1["导出 XML → saveXML → 下方面板"]
+    M --> E2["新建流程图 → createDiagram → 清空画布"]
+    M --> S["状态行：从 elementRegistry 读元素数"]
+```
+
 页面右上角的语言按钮在英文与简体中文之间切换，切换的是页面上全部可见文案（不只是页面标题）。
 
 API 文档在 [https://shijianjs.github.io/ktjs-bpmn/api/](https://shijianjs.github.io/ktjs-bpmn/api/)，由 Dokka 从已发布模块生成。

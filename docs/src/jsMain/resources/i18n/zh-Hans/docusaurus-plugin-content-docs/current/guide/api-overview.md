@@ -12,6 +12,13 @@ title: API 概览
 | `io.github.shijianjs.ktjs.bpmn` | `BpmnViewer`、`BpmnNavigatedViewer`、`BpmnModeler`、`BpmnBaseViewer`、`BpmnBaseModeler`、`BpmnListener`、`bpmnViewer`、`bpmnNavigatedViewer`、`bpmnModeler`、`on`、`onGuarded`、`service` |
 | `…bpmn.core` | `BaseViewerOptions`、`baseViewerOptions`、`BpmnLength`、`BpmnContainer`、`SaveXMLOptions`、`saveXMLOptions`、`ImportXMLResult`、`SaveXMLResult`、`SaveSVGResult`、`BpmnModdleElement`、`BpmnElement`、`BpmnEvent`、`BpmnEvents`、`BpmnModelUtil` |
 
+```mermaid
+flowchart TB
+    E["BpmnViewer / BpmnNavigatedViewer / BpmnModeler"] --> B["BaseViewer：importXML / open / saveXML / saveSVG<br/>attachTo / detach / getDefinitions / clear / destroy"]
+    B --> S["get(service) → elementRegistry / modeling / canvas"]
+    E --> C["core：baseViewerOptions / BpmnContainer / BpmnLength<br/>ImportXMLResult / SaveXMLResult / BpmnEvents / BpmnModelUtil"]
+```
+
 ## 本 wrapper 的约定
 
 - **监听器不返回值。** bpmn-js 把任何非 `undefined` 的返回值读成「取消默认行为」，而 Kotlin 的

@@ -38,6 +38,14 @@ BpmnModeler     // bpmn-js/lib/Modeler.js
 
 The wrapper does that for you. It also imports `bpmn-js/lib/util/ModelUtil.js` for the model helpers, and ships the stylesheets the library needs (`bpmn-js/dist/assets/{diagram-js.css,bpmn-js.css,bpmn-font/}`) with the npm dependency.
 
+```mermaid
+flowchart LR
+    NEW["bpmnModeler(baseViewerOptions { container = BpmnContainer(host) })"] --> ON["on(BpmnEvents.ImportDone): the shim returns nothing"]
+    ON --> LOAD["importXML(xml)"]
+    LOAD --> SAVE["saveXML(saveXMLOptions { format = true })"]
+    SAVE --> OUT["saved.xml"]
+```
+
 ## First call
 
 ```kotlin

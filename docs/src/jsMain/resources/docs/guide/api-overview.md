@@ -12,6 +12,13 @@ title: API overview
 | `io.github.shijianjs.ktjs.bpmn` | `BpmnViewer`, `BpmnNavigatedViewer`, `BpmnModeler`, `BpmnBaseViewer`, `BpmnBaseModeler`, `BpmnListener`, `bpmnViewer`, `bpmnNavigatedViewer`, `bpmnModeler`, `on`, `onGuarded`, `service` |
 | `…bpmn.core` | `BaseViewerOptions`, `baseViewerOptions`, `BpmnLength`, `BpmnContainer`, `SaveXMLOptions`, `saveXMLOptions`, `ImportXMLResult`, `SaveXMLResult`, `SaveSVGResult`, `BpmnModdleElement`, `BpmnElement`, `BpmnEvent`, `BpmnEvents`, `BpmnModelUtil` |
 
+```mermaid
+flowchart TB
+    E["BpmnViewer / BpmnNavigatedViewer / BpmnModeler"] --> B["BaseViewer: importXML / open / saveXML / saveSVG<br/>attachTo / detach / getDefinitions / clear / destroy"]
+    B --> S["get(service) → elementRegistry / modeling / canvas"]
+    E --> C["core: baseViewerOptions / BpmnContainer / BpmnLength<br/>ImportXMLResult / SaveXMLResult / BpmnEvents / BpmnModelUtil"]
+```
+
 ## Conventions this wrapper follows
 
 - **Listeners never return a value.** bpmn-js reads any non-`undefined` return as “cancel the default
