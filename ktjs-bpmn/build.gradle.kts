@@ -53,10 +53,10 @@ kotlin {
 
             // The public surface exposes kotlin-browser types (`HTMLElement`, `TagName`), so this is
             // `api`: a consumer compiles against them through this module.
-            api("org.jetbrains.kotlin-wrappers:kotlin-browser:2026.11.2")
+            api(libs.kotlin.browser)
             // The wrapper's entry points take and return `JsAny` (the modeler hands Kotlin callers
             // opaque model elements), so the bridge type is part of the public surface too.
-            api("org.jetbrains.kotlin-wrappers:kotlin-js:2026.11.2")
+            api(libs.kotlin.js)
         }
         jsMain {
             languageSettings.optIn("kotlin.js.ExperimentalWasmJsInterop")
@@ -65,7 +65,7 @@ kotlin {
             implementation(kotlin("test"))
             // `await()` turns the library's promises into suspend points, so the tests read top to
             // bottom instead of nesting `then` callbacks.
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+            implementation(libs.coroutines.core)
         }
     }
 }
