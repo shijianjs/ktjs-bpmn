@@ -28,8 +28,8 @@ wrapper。**本仓库自己就是模板，也是一个能立刻跑的项目**：
   Markdown，由 [ktjs-docusaurus](https://github.com/shijianjs/ktjs-docusaurus) 的 Gradle 插件组装并调用
   Docusaurus CLI。`pagesSite` 把它放在 Pages **根目录**，demo 在 `/demo/`、API 在 `/api/`：`baseUrl`
   （`/ktjs-bpmn/`）和导航里那两个跳转都由 `Config.kt` 顶部的常量推出来，改布局要一起改。
-  不发布、也不进 Dokka。版本在 `gradle.properties`：`ktjs-docusaurus.version` 是 wrapper klib 的，
-  `ktjs-docusaurus-gradle-plugin.version` 是插件的，`ktjs-docusaurus-kit.version` 是工具箱的（那个项目每个
+  不发布、也不进 Dokka。版本在 `gradle/libs.versions.toml`：`ktjs-docusaurus` 是 wrapper klib 的，
+  `ktjs-docusaurus-gradle-plugin` 是插件的，`ktjs-docusaurus-kit` 是工具箱的（那个项目每个
   模块各有 `-kt.N` 修订号）；写 SNAPSHOT 时从 `mavenLocal` 解析。首页的 `<ktjs-hero>` / `<ktjs-features>` /
   `<ktjs-next-steps>` 来自工具箱：浏览器那一半不是独立 Maven 产物，而是 kit klib 里的
   `ktjs-client/ktjs-docusaurus-kit-browser.js`，`docs/build.gradle.kts` 用 `extractKitBundle` 从 klib
@@ -581,7 +581,7 @@ klibs.io 从 Maven Central 与 GitHub 自动抓取，无需提交元数据文件
 `demo` 的外壳（导航、语言、主题、页面骨架）全部来自 `ktjs-demo-kit`，本仓库只留内容：`Main.kt` 里
 `DemoLayout.NAME`（读一次标签名就注册并升级 `index.html` 里那个元素）+ `DemoMenu`，每个页面一个 `DemoPage` 子类（`page/overview`、`page/modeler`），
 文案走 `SiteTexts` / `Translations`。`demo/build.gradle.kts` 里的 `ktjs-demo-kit` 依赖与 Lumo 拷贝由
-仓库脚手架的接线步骤加好，`gradle.properties` 的 `ktjs-demo-kit.version` 随工作树写 `-SNAPSHOT`。
+仓库脚手架的接线步骤加好，`gradle/libs.versions.toml` 的 `ktjs-demo-kit` 随工作树写 `-SNAPSHOT`。
 
 bpmn-js 有三处与这个外壳的交互必须注意，三者都**不报错、只表现为难看**：
 
